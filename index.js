@@ -13,6 +13,11 @@ const connection = mysql.createConnection({
 	database: 'top_songsDB'
 });
 
+connection.connect((err) => {
+	if (err) throw err;
+	initialPrompts();
+});
+
 const initialPrompts = () => {
 	console.log('Welcome to the Employee Management System!\n');
 	inquirer
@@ -52,8 +57,38 @@ const initialPrompts = () => {
 		});
 };
 
-const addDataPrompts = () => {};
+const addDataPrompts = () => {
+	inquirer
+		.prompt({
+			name: 'addChoices',
+			type: 'list',
+			message: 'What would you like to add?',
+			choices: [ 'Department', 'Role', 'Employee' ]
+		})
+		.then((choice) => {
+			switch (choice.addChoices) {
+				case 'Department':
+					addDepartment();
+					break;
+				case 'Role':
+					addRole();
+					break;
+				case 'Employee':
+					addEmployee();
+					break;
+			}
+		});
+};
 
-const viewDataPrompts = () => {};
+const viewDataPrompts = () => {
+	inquirer.prompt({
+		name: 'viewChoices',
+		type: 'list',
+		message: 'What would you like to view?',
+		choices: [ 'Department', 'Role', 'Employee' ]
+	});
+};
 
-const updateDataPrompts = () => {};
+const updateDataPrompts = () => {
+	inquirer.prompt({});
+};
