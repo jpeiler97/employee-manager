@@ -92,7 +92,7 @@ const viewDataPrompts = () => {
 					const query = 'SELECT * FROM departments';
 					connection.query(query, (err, res) => {
 						if (err) throw err;
-						res.forEach(({ id, depName }) => console.log(`id: ${id} || name: ${depName}`));
+						res.forEach(({ id, name }) => console.log(`id: ${id} || name: ${name}`));
 					});
 					break;
 				case 'Role':
