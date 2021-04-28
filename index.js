@@ -88,17 +88,38 @@ const viewDataPrompts = () => {
 		})
 		.then((choice) => {
 			switch (choice.viewChoices) {
-				case 'Department':
+				case 'Department': {
 					const query = 'SELECT * FROM departments';
 					connection.query(query, (err, res) => {
 						if (err) throw err;
 						res.forEach(({ id, name }) => console.log(`id: ${id} || name: ${name}`));
 					});
 					break;
-				case 'Role':
+				}
+				case 'Role': {
+					const query = 'SELECT * FROM roles';
+					connection.query(query, (err, res) => {
+						if (err) throw err;
+						res.forEach(({ id, title, salary, department_id }) =>
+							console.log(
+								`id: ${id} || title: ${title} || salary: ${salary} || department_id: ${department_id}`
+							)
+						);
+					});
 					break;
-				case 'Employee':
+				}
+				case 'Employee': {
+					const query = 'SELECT * FROM employees';
+					connection.query(query, (err, res) => {
+						if (err) throw err;
+						res.forEach(({ id, first_name, last_name, role_id, manager_id }) =>
+							console.log(
+								`id: ${id} || name: ${first_name} ${last_name} || role_id: ${role_id} || manager_id: ${manager_id}`
+							)
+						);
+					});
 					break;
+				}
 			}
 		});
 };

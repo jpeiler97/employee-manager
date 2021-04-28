@@ -9,7 +9,7 @@ INSERT INTO roles (title, salary, department_id) VALUES
 ('Sales Manager', 100000.00, 1),
 ('Sales Rep', 70000.00, 1),
 ('Lawyer', 150000.00, 2),
-('Legal Team Lead', 150000.00, 2),
+('Legal Team Lead', 100000.00, 2),
 ('Senior Accountant', 80000.00, 3),
 ('Senior Developer', 90000.00, 4),
 ('Software Engineer', 90000.00, 4);
