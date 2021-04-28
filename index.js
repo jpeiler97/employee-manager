@@ -68,25 +68,33 @@ const addDataPrompts = () => {
 		.then((choice) => {
 			switch (choice.addChoices) {
 				case 'Department':
-					addDepartment();
 					break;
 				case 'Role':
-					addRole();
 					break;
 				case 'Employee':
-					addEmployee();
 					break;
 			}
 		});
 };
 
 const viewDataPrompts = () => {
-	inquirer.prompt({
-		name: 'viewChoices',
-		type: 'list',
-		message: 'What would you like to view?',
-		choices: [ 'Department', 'Role', 'Employee' ]
-	});
+	inquirer
+		.prompt({
+			name: 'viewChoices',
+			type: 'list',
+			message: 'What would you like to view?',
+			choices: [ 'Department', 'Role', 'Employee' ]
+		})
+		.then((choice) => {
+			switch (choice.viewChoices) {
+				case 'Department':
+					break;
+				case 'Role':
+					break;
+				case 'Employee':
+					break;
+			}
+		});
 };
 
 const updateDataPrompts = () => {
