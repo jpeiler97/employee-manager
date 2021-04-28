@@ -72,9 +72,12 @@ const addDataPrompts = () => {
 					break;
 				case 'Role':
 					addRole();
+
 					break;
+
 				case 'Employee':
 					addEmployee();
+
 					break;
 			}
 		});
@@ -148,8 +151,8 @@ const addDepartment = () => {
 			connection.query(query, (err, res) => {
 				if (err) throw err;
 				console.log(`Added department!`);
+				initialPrompts();
 			});
-			initialPrompts();
 		});
 };
 
@@ -184,8 +187,8 @@ const addRole = () => {
 			connection.query(query, (err, res) => {
 				if (err) throw err;
 				console.log(`Added role!`);
+				initialPrompts();
 			});
-			initialPrompts();
 		});
 };
 
@@ -249,8 +252,8 @@ const addEmployee = () => {
 					connection.query(query, (err, res) => {
 						if (err) throw err;
 						console.log(`Added employee!`);
+						initialPrompts();
 					});
-					initialPrompts();
 				});
 		});
 };
