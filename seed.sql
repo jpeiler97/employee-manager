@@ -1,0 +1,10 @@
+DROP DATABASE IF EXISTS employee_DB;
+
+CREATE DATABASE employee_DB;
+
+USE employee_DB;
+
+CREATE TABLE departments (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(50) NOT NULL
+);

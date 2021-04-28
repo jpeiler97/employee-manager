@@ -10,7 +10,7 @@ const connection = mysql.createConnection({
 	user: 'root',
 
 	password: 'sunflower2',
-	database: 'top_songsDB'
+	database: 'employee_DB'
 });
 
 connection.connect((err) => {
@@ -66,6 +66,7 @@ const addDataPrompts = () => {
 			choices: [ 'Department', 'Role', 'Employee' ]
 		})
 		.then((choice) => {
+			let userChoice = choice;
 			switch (choice.addChoices) {
 				case 'Department':
 					break;
@@ -88,6 +89,11 @@ const viewDataPrompts = () => {
 		.then((choice) => {
 			switch (choice.viewChoices) {
 				case 'Department':
+					const query = 'SELECT * FROM departments';
+					connection.query(query, (err, res) => {
+						if (err) throw err;
+						res.forEach(({ id, depName }) => console.log(`id: ${id} || name: ${depName}`));
+					});
 					break;
 				case 'Role':
 					break;
