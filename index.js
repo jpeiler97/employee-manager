@@ -66,7 +66,6 @@ const addDataPrompts = () => {
 			choices: [ 'Department', 'Role', 'Employee' ]
 		})
 		.then((choice) => {
-			let userChoice = choice;
 			switch (choice.addChoices) {
 				case 'Department':
 					addDepartment();
@@ -112,6 +111,7 @@ const viewDataPrompts = () => {
 						);
 						initialPrompts();
 					});
+
 					break;
 				}
 				case 'Employee': {
@@ -125,6 +125,7 @@ const viewDataPrompts = () => {
 						);
 						initialPrompts();
 					});
+
 					break;
 				}
 			}
@@ -172,14 +173,14 @@ const addRole = () => {
 				message: 'Please input your role salary.'
 			},
 			{
-				name: 'departmentId',
+				name: 'department',
 				type: 'list',
 				message: 'Please choose your department.',
 				choices: depChoices
 			}
 		])
 		.then((answer) => {
-			const query = `INSERT INTO roles (title, department_id) VALUES ('${answer.name}, ${answer.department_id}')`;
+			const query = `INSERT INTO roles (title, salary, department_id) VALUES ('${answer.title}, ${answer.salary} ${answer.department}')`;
 			connection.query(query, (err, res) => {
 				if (err) throw err;
 				console.log(`Added role!`);
@@ -195,6 +196,13 @@ const addEmployee = () => {
 	connection.query(mgrQuery, (err, res) => {
 		if (err) throw err;
 		res.forEach(({ first_name, last_name }) => mgrChoices.push(first_name + ' ' + last_name));
+	});
+
+	let roleChoices = [];
+	const roleQuery = 'SELECT * FROM roles';
+	connection.query(roleQuery, (err, res) => {
+		if (err) throw err;
+		res.forEach(({ title }) => roleChoices.push(title));
 	});
 	inquirer
 		.prompt([
@@ -222,7 +230,13 @@ const addEmployee = () => {
 						message: "Please enter your employee's last name."
 					},
 					{
-						name: 'managerId',
+						name: 'role',
+						type: 'list',
+						message: 'Please choose your role.',
+						choices: roleChoices
+					},
+					{
+						name: 'manager',
 						type: 'list',
 						message: 'Please choose your manager.',
 						choices: mgrChoices,
@@ -230,10 +244,11 @@ const addEmployee = () => {
 					}
 				])
 				.then((answer) => {
-					const query = `INSERT INTO employees (title, department_id) VALUES ('${answer.name}, ${answer.department_id}')`;
+					const query = `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES 
+					('${answer.firstName}, ${answer.lastName}, ${answer.role}, ${answer.manager}')`;
 					connection.query(query, (err, res) => {
 						if (err) throw err;
-						console.log(`Added role!`);
+						console.log(`Added employee!`);
 					});
 					initialPrompts();
 				});
