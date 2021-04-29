@@ -153,6 +153,7 @@ const addDepartment = () => {
 			connection.query(query, (err, res) => {
 				if (err) throw err;
 				console.log(`Added department!`);
+				initialPrompts();
 			});
 		});
 };
@@ -189,6 +190,7 @@ const addRole = () => {
 			connection.query(query, (err, res) => {
 				if (err) throw err;
 				console.log(`Added role!`);
+				initialPrompts();
 			});
 		});
 };
@@ -203,7 +205,7 @@ const addEmployee = () => {
 
 		connection.query('SELECT * FROM employees WHERE manager_id IS NULL', (err, res) => {
 			if (err) throw err;
-			res.forEach(({ id, first_name, last_name }) => mgrChoices.push(first_name + ' ' + last_name));
+			res.forEach(({ first_name, last_name }) => mgrChoices.push(first_name + ' ' + last_name));
 		});
 
 		let roleChoices = [];
@@ -276,6 +278,7 @@ const addEmployee = () => {
 											(err) => {
 												if (err) throw err;
 												console.log('Employee added!');
+												initialPrompts();
 											}
 										);
 									}
