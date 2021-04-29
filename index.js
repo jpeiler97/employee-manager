@@ -67,18 +67,20 @@ const addDataPrompts = () => {
 		})
 		.then((choice) => {
 			switch (choice.addChoices) {
-				case 'Department':
+				case 'Department': {
 					addDepartment();
 					break;
-				case 'Role':
+				}
+				case 'Role': {
 					addRole();
 
 					break;
-
-				case 'Employee':
+				}
+				case 'Employee': {
 					addEmployee();
 
 					break;
+				}
 			}
 		});
 };
@@ -151,7 +153,6 @@ const addDepartment = () => {
 			connection.query(query, (err, res) => {
 				if (err) throw err;
 				console.log(`Added department!`);
-				initialPrompts();
 			});
 		});
 };
@@ -183,77 +184,112 @@ const addRole = () => {
 			}
 		])
 		.then((answer) => {
-			const query = `INSERT INTO roles (title, salary, department_id) VALUES ('${answer.title}, ${answer.salary} ${answer.department}')`;
+			let query = `INSERT INTO roles (title, salary, department_id) VALUES ('${answer.title}', ${answer.salary}, `;
+			query += `(SELECT departments.id FROM departments WHERE (departments.name = '${answer.department}')))`;
 			connection.query(query, (err, res) => {
 				if (err) throw err;
 				console.log(`Added role!`);
-				initialPrompts();
 			});
 		});
 };
 
 const addEmployee = () => {
-	let mgrChoices = [];
-	let mgr = false;
-	const mgrQuery = 'SELECT * FROM employees WHERE manager_id IS NULL';
-	connection.query(mgrQuery, (err, res) => {
+	let query = `SELECT first_name, last_name, role_id, manager_id, roles.id, roles.title FROM employees `;
+	query += `INNER JOIN roles on employees.role_id = roles.id`;
+	connection.query(query, (err, res) => {
 		if (err) throw err;
-		res.forEach(({ first_name, last_name }) => mgrChoices.push(first_name + ' ' + last_name));
+		let mgrChoices = [];
+		let mgr = false;
+
+		connection.query('SELECT * FROM employees WHERE manager_id IS NULL', (err, res) => {
+			if (err) throw err;
+			res.forEach(({ id, first_name, last_name }) => mgrChoices.push(first_name + ' ' + last_name));
+		});
+
+		let roleChoices = [];
+		connection.query('SELECT * FROM roles ', (err, res) => {
+			if (err) throw err;
+			res.forEach(({ title }) => roleChoices.push(title));
+		});
+		inquirer
+			.prompt([
+				{
+					type: 'list',
+					name: 'managerCheck',
+					message: 'Is your new employee a manager?',
+					choices: [ 'Yes', 'No' ]
+				}
+			])
+			.then((data) => {
+				if (data.managerCheck === 'Yes') {
+					mgr = true;
+				}
+				inquirer
+					.prompt([
+						{
+							name: 'firstName',
+							type: 'input',
+							message: "Please enter your employee's first name."
+						},
+						{
+							name: 'lastName',
+							type: 'input',
+							message: "Please enter your employee's last name."
+						},
+						{
+							name: 'role',
+							type: 'list',
+							message: 'Please choose your role.',
+							choices: roleChoices
+						},
+						{
+							name: 'manager',
+							type: 'list',
+							message: 'Please choose your manager.',
+							choices: mgrChoices,
+							when: mgr === false
+						}
+					])
+					.then((answer) => {
+						connection.query(
+							`SELECT employees.id FROM employees WHERE CONCAT(first_name,  ' ', last_name ) = '${answer.manager}'`,
+							(err, res) => {
+								let chosenRoleId;
+								let chosenManagerId;
+								if (err) throw err;
+								res.forEach(({ id }) => (chosenManagerId = id));
+
+								connection.query(
+									`SELECT roles.id FROM roles WHERE roles.title = '${answer.role}'`,
+									(err, res) => {
+										if (err) throw err;
+										res.forEach(({ id }) => (chosenRoleId = id));
+
+										connection.query(
+											'INSERT INTO employees SET ?',
+											{
+												first_name: answer.firstName,
+												last_name: answer.lastName,
+												role_id: chosenRoleId,
+												manager_id: chosenManagerId || null
+											},
+											(err) => {
+												if (err) throw err;
+												console.log('Employee added!');
+											}
+										);
+									}
+								);
+							}
+						);
+					});
+			});
 	});
 
-	let roleChoices = [];
-	const roleQuery = 'SELECT * FROM roles';
-	connection.query(roleQuery, (err, res) => {
-		if (err) throw err;
-		res.forEach(({ title }) => roleChoices.push(title));
-	});
-	inquirer
-		.prompt([
-			{
-				type: 'list',
-				name: 'managerCheck',
-				message: 'Is your new employee a manager?',
-				choices: [ 'Yes', 'No' ]
-			}
-		])
-		.then((data) => {
-			if (data.managerCheck === 'Yes') {
-				mgr = true;
-			}
-			inquirer
-				.prompt([
-					{
-						name: 'firstName',
-						type: 'input',
-						message: "Please enter your employee's first name."
-					},
-					{
-						name: 'lastName',
-						type: 'input',
-						message: "Please enter your employee's last name."
-					},
-					{
-						name: 'role',
-						type: 'list',
-						message: 'Please choose your role.',
-						choices: roleChoices
-					},
-					{
-						name: 'manager',
-						type: 'list',
-						message: 'Please choose your manager.',
-						choices: mgrChoices,
-						when: mgr === false
-					}
-				])
-				.then((answer) => {
-					const query = `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES 
-					('${answer.firstName}, ${answer.lastName}, ${answer.role}, ${answer.manager}')`;
-					connection.query(query, (err, res) => {
-						if (err) throw err;
-						console.log(`Added employee!`);
-						initialPrompts();
-					});
-				});
-		});
+	// SELECT first_name, last_name,
+	// 	role_id,
+	//     manager_id,
+	// 	roles.title
+	// FROM employees
+	// LEFT JOIN roles on employees.role_id = roles.id;
 };
