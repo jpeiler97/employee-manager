@@ -120,12 +120,12 @@ const viewDataPrompts = () => {
 					break;
 				}
 				case 'Employee': {
-					const query = 'SELECT * FROM employees';
+					const query = 'SELECT * FROM employees INNER JOIN roles on employees.role_id = roles.id';
 					connection.query(query, (err, res) => {
 						if (err) throw err;
-						res.forEach(({ id, first_name, last_name, role_id, manager_id }) =>
+						res.forEach(({ id, first_name, last_name, role_id, manager_id, title }) =>
 							console.log(
-								`id: ${id} || name: ${first_name} ${last_name} || role_id: ${role_id} || manager_id: ${manager_id}`
+								`id: ${id} || name: ${first_name} ${last_name} || role_id: ${role_id} || manager_id: ${manager_id} || title: ${title}`
 							)
 						);
 						initialPrompts();
@@ -339,6 +339,7 @@ const updateDataPrompts = () => {
 												(err, res) => {
 													if (err) throw err;
 													console.log('Employee updated!');
+													initialPrompts();
 												}
 											);
 										});
@@ -357,6 +358,7 @@ const updateDataPrompts = () => {
 												(err, res) => {
 													if (err) throw err;
 													console.log('Employee updated!');
+													initialPrompts();
 												}
 											);
 										});
@@ -382,6 +384,7 @@ const updateDataPrompts = () => {
 														(err, res) => {
 															if (err) throw err;
 															console.log('Employee updated!');
+															initialPrompts();
 														}
 													);
 												}
