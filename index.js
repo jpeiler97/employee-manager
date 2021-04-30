@@ -97,9 +97,11 @@ const viewDataPrompts = () => {
 			switch (choice.viewChoices) {
 				case 'Department': {
 					const query = 'SELECT * FROM departments';
+					let table = [];
 					connection.query(query, (err, res) => {
 						if (err) throw err;
-						res.forEach(({ id, name }) => console.log(`id: ${id} || name: ${name}`));
+						res.forEach(({ id, name }) => table.push({ id: id, name: name }));
+						console.table(table);
 						initialPrompts();
 					});
 
@@ -107,13 +109,13 @@ const viewDataPrompts = () => {
 				}
 				case 'Role': {
 					const query = 'SELECT * FROM roles';
+					let table = [];
 					connection.query(query, (err, res) => {
 						if (err) throw err;
-						res.forEach(({ id, title, salary, department_id }) =>
-							console.log(
-								`id: ${id} || title: ${title} || salary: ${salary} || department_id: ${department_id}`
-							)
-						);
+						res.forEach(({ id, title, salary, department_id }) => {
+							table.push({ ID: id, Title: title, Salary: salary, Department: department_id });
+						});
+						console.table(table);
 						initialPrompts();
 					});
 
@@ -121,13 +123,20 @@ const viewDataPrompts = () => {
 				}
 				case 'Employee': {
 					const query = 'SELECT * FROM employees INNER JOIN roles on employees.role_id = roles.id';
+					let table = [];
 					connection.query(query, (err, res) => {
 						if (err) throw err;
-						res.forEach(({ id, first_name, last_name, role_id, manager_id, title }) =>
-							console.log(
-								`id: ${id} || name: ${first_name} ${last_name} || role_id: ${role_id} || manager_id: ${manager_id} || title: ${title}`
-							)
-						);
+						res.forEach(({ id, first_name, last_name, role_id, manager_id, title }) => {
+							table.push({
+								ID: id,
+								'First Name': first_name,
+								'Last Name': last_name,
+								'Role ID': role_id,
+								'Manager ID': manager_id || 'Manager',
+								Title: title
+							});
+						});
+						console.table(table);
 						initialPrompts();
 					});
 
@@ -324,7 +333,7 @@ const updateDataPrompts = () => {
 							res.forEach(({ title }) => {
 								roleChoices.push(title);
 							});
-							console.log(roleChoices);
+
 							switch (answer.colChoices) {
 								case 'First Name': {
 									inquirer
