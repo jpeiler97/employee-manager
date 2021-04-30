@@ -15,11 +15,11 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
 	if (err) throw err;
+	console.log('Welcome to the Employee Management System!\n');
 	initialPrompts();
 });
 
 const initialPrompts = () => {
-	console.log('Welcome to the Employee Management System!\n');
 	inquirer
 		.prompt({
 			name: 'choiceList',
@@ -135,10 +135,6 @@ const viewDataPrompts = () => {
 				}
 			}
 		});
-};
-
-const updateDataPrompts = () => {
-	inquirer.prompt({});
 };
 
 const addDepartment = () => {
@@ -288,11 +284,115 @@ const addEmployee = () => {
 					});
 			});
 	});
+};
 
-	// SELECT first_name, last_name,
-	// 	role_id,
-	//     manager_id,
-	// 	roles.title
-	// FROM employees
-	// LEFT JOIN roles on employees.role_id = roles.id;
+const updateDataPrompts = () => {
+	let employeeChoices = [];
+	connection.query('SELECT * FROM employees WHERE manager_id IS NOT NULL', (err, res) => {
+		if (err) throw err;
+
+		// res.forEach(({ first_name, last_name }) => employeeChoices.push(`${first_name} ${last_name}`));
+		res.forEach((res) => {
+			employeeChoices.push(res.first_name + ' ' + res.last_name);
+		});
+		inquirer
+			.prompt([
+				{
+					name: 'empChoices',
+					type: 'list',
+					message: 'Which employee would you like to update?',
+					choices: employeeChoices
+				},
+				{
+					name: 'colChoices',
+					type: 'list',
+					message: 'What would you like to update?',
+					choices: [ 'First Name', 'Last Name', 'Role', 'Manager' ]
+				}
+			])
+			.then((answer) => {
+				let wholeName = answer.empChoices;
+				let empId;
+				let roleChoices = [];
+				connection.query(
+					`SELECT id FROM employees WHERE CONCAT(first_name, ' ', last_name) = '${wholeName}'`,
+					(err, res) => {
+						if (err) throw err;
+						res.forEach(({ id }) => (empId = id));
+						connection.query(`SELECT * FROM roles`, (err, res) => {
+							if (err) throw err;
+							res.forEach(({ title }) => {
+								roleChoices.push(title);
+							});
+							console.log(roleChoices);
+							switch (answer.colChoices) {
+								case 'First Name': {
+									inquirer
+										.prompt({
+											name: 'firstName',
+											type: 'input',
+											message: 'Enter a new first name:'
+										})
+										.then((answer) => {
+											connection.query(
+												`UPDATE employees SET first_name = '${answer.firstName}' WHERE id = ${empId}`,
+												(err, res) => {
+													if (err) throw err;
+													console.log('Employee updated!');
+												}
+											);
+										});
+									break;
+								}
+								case 'Last Name': {
+									inquirer
+										.prompt({
+											name: 'lastName',
+											type: 'input',
+											message: 'Enter a new last name:'
+										})
+										.then((answer) => {
+											connection.query(
+												`UPDATE employees SET last_name = '${answer.lastName}' WHERE id = ${empId}`,
+												(err, res) => {
+													if (err) throw err;
+													console.log('Employee updated!');
+												}
+											);
+										});
+									break;
+								}
+								case 'Role': {
+									inquirer
+										.prompt({
+											name: 'role',
+											type: 'list',
+											message: 'Choose a new role:',
+											choices: roleChoices
+										})
+										.then((answer) => {
+											let role;
+											connection.query(
+												`SELECT * FROM roles WHERE roles.title = '${answer.role}'`,
+												(err, res) => {
+													if (err) throw err;
+													res.forEach(({ id }) => (role = id));
+													connection.query(
+														`UPDATE employees SET role_id = ${role} WHERE id = '${empId}'`,
+														(err, res) => {
+															if (err) throw err;
+															console.log('Employee updated!');
+														}
+													);
+												}
+											);
+										});
+									break;
+								}
+							}
+						});
+					}
+				);
+			});
+	});
 };
