@@ -316,7 +316,7 @@ const updateDataPrompts = () => {
 					name: 'colChoices',
 					type: 'list',
 					message: 'What would you like to update?',
-					choices: [ 'First Name', 'Last Name', 'Role', 'Manager' ]
+					choices: [ 'First Name', 'Last Name', 'Role' ]
 				}
 			])
 			.then((answer) => {
