@@ -34,6 +34,9 @@ To use this application:
 1. After installing, type "node index.js".
 2. Follow the screen prompts as needed. When finished, choose "exit" to stop the application.
 
+[![Functionality](https://img.youtube.com/vi/xxPGe-tVjHA/0.jpg)](https://www.youtube.com/watch?v=xxPGe-tVjHA)
+
+
 <a name="license"></a>
 ## License
 This application is covered under the MIT license.
